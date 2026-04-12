@@ -1,5 +1,6 @@
 from machine import Pin
 
+from async_webserver import start_async_webserver
 from webserver import init_network, start_server
 
 
@@ -21,6 +22,9 @@ def handler(path):
         return get_body("off")
 
 
-def run():
+def run(async_webserver=False):
     init_network()
-    start_server(handler)
+    if not async_webserver:
+        start_server(handler)
+    else:
+        start_async_webserver(handler)

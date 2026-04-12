@@ -24,7 +24,7 @@ The command to flash your esp32 is:
 sudo uv run -m esptool -p /dev/ttyUSB0 flash-id
 ```
 
-**-p** stands for port. On Linux, it will be the file used by the system to represernt the usb port.
+**-p** stands for port. On Linux, it will be the file used by the system to represent the usb port.
 
 There are two ways you can use to know that. You can do a `ls /dev/` and look at the file that is mostlikely the usb.
 Or you can use `dmesg` and `grep` to see where the kernel has mounted the usb port with the command `dmesg | grep USB` after  you plugged the device. Here is an example output:
@@ -38,9 +38,9 @@ $ sudo dmsg | grep USB
 ```
 According to this log, the usb port is in `/dev/ttyUSB0`.
 
-## Activate a led
+## Turn on and off a led
 
-Talk about the repl, the file structure and how to send main.py via pyboard or webrepl.
+Micropython 
 You can open a repl using an app like `picocom` or `minicom`.
 
 ```bash
