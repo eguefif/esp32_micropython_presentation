@@ -10,16 +10,24 @@
 * breadboard
 * one led
 * one 220Ω
-* two jumper wire male/male
+* two jumper wires male/male
 
 See the picture.
 
 ## Flashing the firmware (Linux)
 
-You need `esptool`. You can install it in your project via `pip install esptool`.
-You also need to know what Linux device file the usb will be mounted. You can do a `ls /dev/` or look
-at the `dmsg` logging tool with the command `dmsg | grep USB` right after plugging the device. Here is
-an example output:
+We can use `esptool` to flash the hardware. You can install this program in your project via `pip install esptool`.
+
+The command to flash your esp32 is:
+
+```bash
+sudo uv run -m esptool -p /dev/ttyUSB0 flash-id
+```
+
+**-p** stands for port. On Linux, it will be the file used by the system to represernt the usb port.
+
+There are two ways you can use to know that. You can do a `ls /dev/` and look at the file that is mostlikely the usb.
+Or you can use `dmesg` and `grep` to see where the kernel has mounted the usb port with the command `dmesg | grep USB` after  you plugged the device. Here is an example output:
 ```bash
 $ sudo dmsg | grep USB
 
@@ -28,11 +36,7 @@ $ sudo dmsg | grep USB
 [29241.401594] usb 1-1: Product: CP2102N USB to UART Bridge Controller
 [29241.406268] usb 1-1: cp210x converter now attached to ttyUSB0 <--------
 ```
-Then use `esptool` to flash the device with micro python. In my case, I use uv to install esptool.
-
-```bash
-sudo uv run -m esptool -p /dev/ttyUSB0 flash-id
-```
+According to this log, the usb port is in `/dev/ttyUSB0`.
 
 ## Activate a led
 
@@ -55,14 +59,6 @@ I did not find where to know that number. I guess this is the default configurat
 
 To execute picocom, type `C-aC-x`
 
-## Activating network
-
-The esp32 allows two ways of using the wifi:
-* Connect to an existing wifi.
-* Run as a wifi point.
-
-We will use the first one to connect to an existing Wifi point. 
-See the code in `init_network`.
 
 ## Copying files
 
@@ -100,3 +96,14 @@ It's usefull to know that we cannot have two program using `/dev/ttyUSB0`. So if
 ## Activate the led remotely
 
 In this example, we will setup a webserver on our esp32 and allow a remote user to turn on and off the led.
+
+### Activating network
+
+The esp32 allows two ways of using the wifi:
+* Connect to an existing wifi.
+* Run as a wifi point.
+
+We will use the first one to connect to an existing Wifi point. 
+See the code in `init_network`.
+
+### Setup the webserver
