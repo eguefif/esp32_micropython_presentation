@@ -8,6 +8,7 @@ from secret import PASSWORD, SSID
 
 # Setup the wifi
 def init_network():
+    """Connect to WiFi using credentials from secret.py and print the assigned IP."""
     print("Initializing network")
     sta_if = network.WLAN(network.WLAN.IF_STA)
     sta_if.active(True)
@@ -19,6 +20,7 @@ def init_network():
 
 
 def get_path_from_request(sock):
+    """Read an HTTP request from sock and return the request path (e.g. '/led/on')."""
     data = b""
     while True:
         data += sock.recv(1024)
@@ -32,12 +34,14 @@ def get_path_from_request(sock):
 
 
 def send_response(sock, body):
+    """Send a 200 OK HTTP response with body (bytes) over sock."""
     header = f"HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-Length:{len(body)}\r\n\r\n"
     sock.send(header.encode())
     sock.send(body)
 
 
 def render_page(body):
+    """Wrap an HTML body string in a full HTML page and return it as bytes."""
     html = f"""<!DOCTYPE html>
     <html>
         <head> <title>ESP8266 Pins</title> </head>
@@ -50,6 +54,7 @@ def render_page(body):
 
 
 def send_404(sock):
+    """Send a 404 Not Found HTTP response over sock."""
     body = b"<h1>404 Not Found</h1>"
     header = f"HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\nContent-Length:{len(body)}\r\n\r\n"
     sock.send(header.encode())
@@ -57,6 +62,11 @@ def send_404(sock):
 
 
 def handle_client(sock, handler):
+    """Parse the request from sock, call handler(path), and send the response.
+
+    handler must return bytes for a valid path, or a falsy value to trigger a 404.
+    The socket is closed after the response is sent.
+    """
     path = get_path_from_request(sock)
     body = handler(path)
     if not body:
@@ -68,6 +78,12 @@ def handle_client(sock, handler):
 
 
 def start_server(handler):
+    """Listen on port 80 and dispatch each incoming connection to handle_client.
+
+    handler is a callable that receives the request path and returns a response body
+    (bytes), or a falsy value if the path is not found.
+    Runs forever; exceptions per connection are caught and logged without stopping the server.
+    """
     s = socket.socket()
     s.bind(("0.0.0.0", 80))
     s.listen(1)

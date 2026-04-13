@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [ ] Find how to not sudo all the time
+- [ ] Find how to not sudo all the time when working on /dev/ttyUSB0
 
 ## Hardware
 
@@ -69,8 +69,9 @@ After we flashed the hardware, there is a filesystem that we can use to store fi
 The file `boot.py` will be the first to ran by the runtime. Then, it is some kind of initializer scrip that we can change to run things. Then, the run time will be `main.py`.
 
 ### Copy a file
+
 We can copy files to the file system using [pyboard.py](https://github.com/micropython/micropython/blob/master/tools/pyboard.py).
-You will need to install `pip install pyserial`.
+You first will need to install the dependency `pip install pyserial`.
 
 Then, if you want to copy a file, run the following command. I use uv, so it will look like:
 ```bash
@@ -79,19 +80,25 @@ $ sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./main.py :main.py
 $ sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./main.py :
 ```
 
-### Use case
+### Turn on a led
 
 There is a very simple program in `simple_led.py`, let's use as a practice example.
 
 ```bash
 $ sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp./simple_led.py:main.py
 ```
-Then reboot the esp32 using the reboot button (the button on the red led side).
+Then reboot the esp32 using the reboot button (the button on the red led side). Here is a picture of how I plugged things on the breadboard:
+
+PICTURE
+
+We put a 220 Ω resistance between the led and the esp32 to dimish the currant. The led does not opposed enough resistance to be used only by itself.
+We plug the resistance with the GPIO 33 and the led with the GND. If it does not work, try to swap the led.
 
 ## Debugging
 
-In our code, we print debug some information. If we don't do anything, we won't be able to see these debug print. The way to see then is to run `picocom -b 115200 /dev/ttyUSB0`. 
-It's usefull to know that we cannot have two program using `/dev/ttyUSB0`. So if you're listening to this tty, you won't be able to use `pyboard.py` to copy files on the esp32.
+In our code, we print debug information. The way to see then is to run `picocom -b 115200 /dev/ttyUSB0`. 
+Beware that we cannot have two program using `/dev/ttyUSB0`. So if you're listening to this tty, you won't be able to use `pyboard.py` to copy files on the esp32.
+Try to run the previous program and you will see the debug information.
 
 ## Activate the led remotely
 
@@ -107,3 +114,27 @@ We will use the first one to connect to an existing Wifi point.
 See the code in `init_network`.
 
 ### Setup the webserver
+
+For this example, we will use two files:
+* [server_led.py](./server_led.py)
+* [webserver.py](./webserver.py)
+
+The first file contains the logic to run the server and a dispatch function to give to the server.
+
+THe second file is a very simple webserver that listen to a socket and handle new client via the `handle_client`. Both functions take a `handler` function passed by the caller. This function must returns bytes when a path is handled of a falsy value to trigger a 404.
+
+There is also an async version of the webserver in [async_webserver.py](./async_webserver.py).
+
+## Button: check button
+
+- [ ] TODO
+
+## Notify system
+
+When the button is on more than 2 secondes, send notification.
+
+- [ ] TODO
+
+## Reed switch
+
+Replace the button by the reed switch.
