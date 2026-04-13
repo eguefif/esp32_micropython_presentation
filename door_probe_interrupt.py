@@ -13,9 +13,9 @@ schedule_timer = False
 
 def interrupt_handler(_p):
     global schedule_timer
-    if pin.value() == 1:
+    if pin.value() == 0:  # FALLING: button pressed
         schedule_timer = True
-    else:
+    else:  # RISING: button released
         timer.deinit()
         schedule_timer = False
 
@@ -23,7 +23,7 @@ def interrupt_handler(_p):
 def check_callback(_t):
     global notify
     timer.deinit()
-    if pin.value() == True:
+    if pin.value() == False:
         notify = True
 
 
@@ -31,10 +31,10 @@ def do_notify():
     global notify
     notify = False
     print("Hey, the button was pushed")
-    # try:
-    #    notify_user.notify()
-    # except Exception as e:
-    #    print(e)
+    try:
+        notify_user.notify()
+    except Exception as e:
+        print(e)
 
 
 def run():

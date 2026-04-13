@@ -3,6 +3,7 @@ init:
 
 cp:
   sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./secret.py :
+  sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./notify_user.py :
   sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./webserver.py :
   sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./async_webserver.py :
   sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./server_led.py :

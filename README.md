@@ -138,3 +138,7 @@ When the button is on more than 2 secondes, send notification.
 ## Reed switch
 
 Replace the button by the reed switch.
+
+## Watchdog
+
+- [ ] TODO
