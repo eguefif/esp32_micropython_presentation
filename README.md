@@ -127,17 +127,34 @@ There is also an async version of the webserver in [async_webserver.py](./async_
 
 ## Button: check button
 
-- [ ] TODO
+- [ ] Take picture
 
 ## Notify system
 
-When the button is on more than 2 secondes, send notification.
+You can install the notification system via the docker compose file.
+We use [ntfy.sh](https://ntfy.sh) as a notification system. Before you can subscribe, we need to send a first notification to activate the feed.
 
-- [ ] TODO
+```bash
+$ curl -d "Hey" "http://localhost:8080/door-open"
+
+{"id":"7HV6WuBWR1u2","time":1776107631,"expires":1776150831,"event":"message","topic":"door-open","message":"Hey"}
+```
+It will create a new feed named `door-open` to which you can subscribe.
+
+If you need to you local wifi address ip, here is the command on linux
+
+```bash
+$ ip addr | grep wlan0 -A 5 | grep "inet "
+
+inet 192.168.1.143/24 brd 192.168.1.255 scope global dynamic noprefixroute wlan0
+
+```
+
+You can check the code in [notify_user.py](./notify_user.py). We only send a simple post request along with the host in the header. We also need to read the response as it can prevent ntfy to register the notification.
 
 ## Reed switch
 
-Replace the button by the reed switch.
+The code is in [door_probe_interrupt.py](./door_probe_interrupt.py). The only difference with the `button_interrupt.py` code is that we check the opposite signal. The reed switch, when the door is closed, is triggering a high signal to the GPIO pin. When the door is open, the signal fall to a low. If it last too long, we notify the user.
 
 ## Watchdog
 
