@@ -158,4 +158,15 @@ The code is in [door_probe_interrupt.py](./door_probe_interrupt.py). The only di
 
 ## Watchdog
 
-- [ ] TODO
+The example is in [button_interrupt.py](./button_interrupt_watchdog.py). A watchdog is some kind of a timer that is reset anytime we feed it. If the program fails to notify the watchdog, it will reset the system.
+
+A way to simulate that is to add a firewall rule to the port 8080. Doing so will make the esp32 hang when trying to notify the user. As the os silently drop the packet, the esp32 wait for the TCP handshake to happend. We can set a watchdog that will reset the system and avoid waiting.
+
+Here is how to set the firewall
+
+```bash
+sudo ufw deny 8080/tcp
+
+# Then, when we want to drop the rule
+sudo ufw allow 8080/tcp
+```
