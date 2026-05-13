@@ -38,6 +38,15 @@ $ sudo dmesg | grep USB
 ```
 According to this log, the usb port is in `/dev/ttyUSB0`.
 
+## Where to find the firmware
+[MicroPython documention for esp32](https://docs.micropython.org/en/latest/esp32/quickref.html)
+
+Download the firmware and use `esptool` to erase and flash the firmware.
+```bash
+$ sudo uv run -m esptool -p /dev/ttyUSB0 erase-flash
+$ sudo uv run -m esptool -p /dev/ttyUSB0 --baud 460800 write-flash 0x1000 firmware.bin
+```
+
 ## Turn on and off a led
 
 You can open a repl using an app like `picocom` or `minicom`.
@@ -105,6 +114,12 @@ The most important command to know while running picocom is `C-aC-x`. It will ex
 
 In this example, we will setup a webserver on our esp32 and allow a remote user to turn on and off the led.
 
+### Files
+* [secret.py](./secret.py): contains the WiFi-credentials. This files is not commit in Git, you need to create it.
+* [webserver.py](./webserver.py): contains a simple websever that handles http request.
+* [async_webserver.py](./async_webserver.py): contains an async websever that handles http request.
+* [server_led.py](./server_led.py): contains the actual logic that handles led and routing
+
 ### Activating network
 
 The esp32 allows two ways of using the wifi:
@@ -112,7 +127,7 @@ The esp32 allows two ways of using the wifi:
 * Run as a wifi point.
 
 We will use the first one to connect to an existing Wifi point. 
-See the code in `init_network`.
+See the code in `webserver.init_network`.
 
 ### Setup the webserver
 
@@ -122,13 +137,12 @@ For this example, we will use two files:
 
 The first file contains the logic to run the server and a dispatch function to give to the server.
 
-THe second file is a very simple webserver that listen to a socket and handle new client via the `handle_client`. Both functions take a `handler` function passed by the caller. This function must returns bytes when a path is handled of a falsy value to trigger a 404.
+The second file is a very simple webserver that listen to a socket and handle new client via the `handle_client`. Both functions take a `handler` function passed by the caller. This function must returns bytes when a path is handled of a falsy value to trigger a 404.
 
 There is also an async version of the webserver in [async_webserver.py](./async_webserver.py).
 
 ## Button: check button
 
-- [ ] Take picture
 
 ## Notify system
 

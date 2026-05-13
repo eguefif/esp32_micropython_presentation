@@ -73,7 +73,7 @@ def handle_client(sock, handler):
         send_404(sock)
     else:
         send_response(sock, body)
-    time.sleep(2)
+    time.sleep(2)  # Wait for the response to go through
     sock.close()
 
 

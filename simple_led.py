@@ -3,7 +3,7 @@ import time
 from machine import Pin
 
 
-def light():
+def light(led):
     print("Led on")
     led.on()
     time.sleep(2)
@@ -12,9 +12,10 @@ def light():
 
 
 def run():
-    pin = Pin(33, Pin.IN)
+    led = Pin(33, Pin.OUT)
     # light(led)
     while True:
-        if pin.value() == True:
-            print("pin true")
-        time.sleep(0.2)
+        led.on()
+        time.sleep(0.3)
+        led.off()
+        time.sleep(0.3)
