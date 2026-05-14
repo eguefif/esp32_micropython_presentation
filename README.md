@@ -10,6 +10,7 @@
 * breadboard
 * one led
 * one 220Ω
+* one 10kΩ
 * two jumper wires male/male
 
 See the picture.
@@ -24,7 +25,7 @@ The command to flash your esp32 is:
 sudo uv run -m esptool -p /dev/ttyUSB0 flash-id
 ```
 
-**-p** stands for port. On Linux, it will be the file used by the system to represent the usb port.
+**-p** stands for port. On Linux, it will be the file used to interact with the usb port.
 
 There are two ways you can use to know that. You can do a `ls /dev/` and look at the file that is most likely the usb.
 Or you can use `dmesg` and `grep` to see where the kernel has mounted the usb port with the command `dmesg | grep USB` after you plugged the device. Here is an example output:
@@ -37,6 +38,13 @@ $ sudo dmesg | grep USB
 [29241.406268] usb 1-1: cp210x converter now attached to ttyUSB0 <--------
 ```
 According to this log, the usb port is in `/dev/ttyUSB0`.
+
+## How to not sudo all the time
+
+The way to avoid sudoing a command to interact with the `/dev/ttyUSB0` file is to add your user in the right group. It changes depending on your Linux distribution:
+
+* [uucp](https://wiki.archlinux.org/title/Users_and_groups#User_groups) on arch.
+* [dialout](https://wiki.debian.org/SystemGroups) on Debian based machine and RedHat/Fedora.
 
 ## Where to find the firmware
 [MicroPython documention for esp32](https://docs.micropython.org/en/latest/esp32/quickref.html)
@@ -186,3 +194,11 @@ sudo ufw deny 8080/tcp
 # Then, when we want to drop the rule
 sudo ufw allow 8080/tcp
 ```
+
+## TODO
+- [ ] Refactor README
+    - [ ] Notify is in docker
+    - [ ] For each part, list files to see
+    - [ ] Add comment to explain the Micropython interface
+
+- [ ] Add notion we will cover in presentation: GPIO, WiFi, Interrupt, Watchdog

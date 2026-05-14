@@ -29,5 +29,5 @@ run()
 
 # Watchdog Example ----------------------------------------
 
-# import button_interrupt_watchdog
-# button_interrupt_watchdog.run()
+# from reed_switch_watchdog import run
+# run()

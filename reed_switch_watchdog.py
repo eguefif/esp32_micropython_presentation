@@ -13,7 +13,7 @@ schedule_timer = False
 
 def interrupt_handler(_p):
     global schedule_timer
-    if pin.value() == 1:
+    if pin.value() == 0:
         schedule_timer = True
     else:
         timer.deinit()
@@ -30,7 +30,6 @@ def check_callback(_t):
 def do_notify():
     global notify
     notify = False
-    print("Hey, the button was pushed")
     try:
         notify_user.notify()
     except Exception as e:
@@ -39,7 +38,7 @@ def do_notify():
 
 def run():
     init_network()
-    wdt = WDT(timeout=15000)
+    wdt = WDT(timeout=15000)  # Add a WatchDog handler
     global schedule_timer
     pin.irq(handler=interrupt_handler, trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING)
     print("Ready to check your door")
@@ -49,5 +48,5 @@ def run():
             timer.init(period=2_000, mode=Timer.ONE_SHOT, callback=check_callback)
         if notify:
             do_notify()
-        wdt.feed()
+        wdt.feed()  # Feed the watch dog
         time.sleep(0.2)
