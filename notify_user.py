@@ -4,7 +4,7 @@ import socket
 def notify():
     print("Notifying user")
     sock = socket.socket()
-    host = "192.168.1.143"
+    host = "10.186.111.114"
     port = 8080
     topic = "door-open"
     message = b"Your door is open!!"

@@ -25,20 +25,22 @@ def check_callback(_t):
     timer.deinit()
     if pin.value() == 0:
         notify = True
+        return
+    print("Cancelling timer: door was closed again")
 
 
 def do_notify():
     global notify
     notify = False
     print("Hey, the reed switch was trigger")
-    # try:
-    #    notify_user.notify()
-    # except Exception as e:
-    #    print(e)
+    try:
+        notify_user.notify()
+    except Exception as e:
+        print(e)
 
 
 def run():
-    # init_network()
+    init_network()
     global schedule_timer
     pin.irq(handler=interrupt_handler, trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING)
     print("Ready to check your door")
