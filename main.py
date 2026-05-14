@@ -16,11 +16,16 @@
 # from button import run as run_button
 #
 # run_button()
-from button_interrupt import run as run_button_irq
+# from button_interrupt import run as run_button_irq
 
-run_button_irq()
+# run_button_irq()
 
-# Button Handling Example ----------------------------------------
+# Reed Switch and notify Handling Example ----------------------------------------
+
+from reed_switch import run
+
+run()
+
 
 # Watchdog Example ----------------------------------------
 

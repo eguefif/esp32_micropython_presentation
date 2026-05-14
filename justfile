@@ -21,6 +21,13 @@ button-irq:
   sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./button_interrupt.py :
   sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./main.py :main.py
 
+reed-switch:
+  sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./notify_user.py :
+  sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./secret.py :
+  sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./webserver.py :
+  sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./reed_switch.py :
+  sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./main.py :main.py
+
 
 cp:
   sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./secret.py :
