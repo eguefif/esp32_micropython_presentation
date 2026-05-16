@@ -1,31 +1,33 @@
 # Micropython primer
 
-## TODO
-
-- [ ] Find how to not sudo all the time when working on /dev/ttyUSB0
-
 ## Hardware
 
 * Esp32 wroom dev kitc
-* breadboard
-* one led
-* one 220Ω
-* one 10kΩ
-* two jumper wires male/male
-
-See the picture.
+* Breadboard
+* One led
+* One 220Ω
+* One 10kΩ
+* Two jumper wires male/male
+* One button
+* One reed-switch
 
 ## Flashing the firmware (Linux)
 
-We can use `esptool` to flash the hardware. You can install this program in your project via `pip install esptool`.
+We can use `esptool` to flash the hardware. You can install this program in your project via `pip install esptool` or `uv add esptool`.
 
 The command to flash your esp32 is:
 
 ```bash
-sudo uv run -m esptool -p /dev/ttyUSB0 flash-id
+sudo uv run -m esptool -p /dev/ttyUSB0 erase-flash
+sudo uv run -m esptool -p /dev/ttyUSB0 --baud 460800 write-flash 0x1000 firmware.bin
 ```
 
 **-p** stands for port. On Linux, it will be the file used to interact with the usb port.
+
+**-baud 460800** defines the serial speed rate at which to communicate with the esp32. The computer communicates with the Esp32 via an Usb-To-Uart port. It is based on serial data communication with no shared clock. It means that both side has to define the speed rate at which they send bits. Here we set communication at 460800.
+
+**0x1000** is the address to which we ask esptool to copy the firware.
+**firmware.bin** is the filepath where esptool can find the firmware on our machine.
 
 There are two ways you can use to know that. You can do a `ls /dev/` and look at the file that is most likely the usb.
 Or you can use `dmesg` and `grep` to see where the kernel has mounted the usb port with the command `dmesg | grep USB` after you plugged the device. Here is an example output:
@@ -105,7 +107,7 @@ $ sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./simple_led.py :main.py
 ```
 Then reboot the esp32 using the reboot button (the button on the red led side). Here is a picture of how I plugged things on the breadboard:
 
-PICTURE
+![Picture of the led breadboard circuit](./pictures/led.jpg)
 
 We put a 220 Ω resistance between the led and the esp32 to diminish the current. The led does not offer enough resistance to be used by itself.
 We plug the resistance with the GPIO 33 and the led with the GND. If it does not work, try to swap the led.
@@ -127,6 +129,7 @@ In this example, we will setup a webserver on our esp32 and allow a remote user 
 * [webserver.py](./webserver.py): contains a simple websever that handles http request.
 * [async_webserver.py](./async_webserver.py): contains an async websever that handles http request.
 * [server_led.py](./server_led.py): contains the actual logic that handles led and routing
+* [main.py](./main.py): uncommont what you need
 
 ### Activating network
 
@@ -151,12 +154,19 @@ There is also an async version of the webserver in [async_webserver.py](./async_
 
 ## Button: check button
 
+![Picture of the button breadboard circuit](./pictures/button.jpg)
+
+### Files
+* [button.py](./button.py): basic example
+* [button_interrupt.py](./button.py): more advance example with interrupt
+* [main.py](./main.py): uncommont what you need
 
 
 ## Notify system
 
-You can install the notification system via the docker compose file.
-We use [ntfy.sh](https://ntfy.sh) as a notification system. Before you can subscribe, we need to send a first notification to activate the feed.
+### Explanation
+
+Notify([ntfy.sh](https://ntfy.sh)) is an open source notification system. You can use the docker compose file to spin up a server. Before using it with our Esp32, let's send a notification via Curl.
 
 ```bash
 $ curl -d "Hey" "http://localhost:8080/door-open"
@@ -174,7 +184,12 @@ inet 192.168.1.143/24 brd 192.168.1.255 scope global dynamic noprefixroute wlan0
 
 ```
 
-You can check the code in [notify_user.py](./notify_user.py). We only send a simple post request along with the host in the header. We also need to read the response as it can prevent ntfy from registering the notification.
+Then you can install *ntfy* on your phone and subscribe to a new topic. When doing so, click on `Use another server` and write `http://192.168.1.143:8080`. The IP addres is the one you get from the `ip addr` command the port is defined in the `docker-compose` file.
+
+The Esp-32 code that will use is in [notify_user.py](./notify_user.py). We only send a simple post request along with the host in the header. We also need to read the response as it can prevent ntfy from registering the notification.
+
+### Files
+* [notify_user.py](./notify_user.py)
 
 ## Reed switch
 
@@ -202,3 +217,13 @@ sudo ufw allow 8080/tcp
     - [ ] Add comment to explain the Micropython interface
 
 - [ ] Add notion we will cover in presentation: GPIO, WiFi, Interrupt, Watchdog
+
+
+## References
+[Esp32 devkitc datasheets](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#related-documents)
+[Basic on UART](https://www.electronicshub.org/basics-uart-communication/)
+[esptool documentation](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html)
+[micropython firmware for esp32](https://micropython.org/download/ESP32_GENERIC/)
+[Esp32 boot process specificaiton](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/startup.html)
+
+[Interrupt documentation Micropython](https://docs.micropython.org/en/latest/reference/isr_rules.html)

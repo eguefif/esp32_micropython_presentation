@@ -16,7 +16,6 @@ def interrupt_handler(_p):
     if pin.value() == 0:
         schedule_timer = True
     else:
-        timer.deinit()
         schedule_timer = False
 
 
@@ -49,6 +48,8 @@ def run():
             print("Schedule timer")
             schedule_timer = False
             timer.init(period=2_000, mode=Timer.ONE_SHOT, callback=check_callback)
+        else:
+            timer.deinit()
         if notify:
             do_notify()
         time.sleep(0.2)
