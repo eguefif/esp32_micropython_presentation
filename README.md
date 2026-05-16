@@ -15,6 +15,8 @@
 
 We can use `esptool` to flash the hardware. You can install this program in your project via `pip install esptool` or `uv add esptool`.
 
+[micropython firmware for esp32](https://micropython.org/download/ESP32_GENERIC/)
+
 The command to flash your esp32 is:
 
 ```bash
@@ -27,6 +29,7 @@ sudo uv run -m esptool -p /dev/ttyUSB0 --baud 460800 write-flash 0x1000 firmware
 **-baud 460800** defines the serial speed rate at which to communicate with the esp32. The computer communicates with the Esp32 via an Usb-To-Uart port. It is based on serial data communication with no shared clock. It means that both side has to define the speed rate at which they send bits. Here we set communication at 460800.
 
 **0x1000** is the address to which we ask esptool to copy the firware.
+
 **firmware.bin** is the filepath where esptool can find the firmware on our machine.
 
 There are two ways you can use to know that. You can do a `ls /dev/` and look at the file that is most likely the usb.
@@ -48,25 +51,21 @@ The way to avoid sudoing a command to interact with the `/dev/ttyUSB0` file is t
 * [uucp](https://wiki.archlinux.org/title/Users_and_groups#User_groups) on arch.
 * [dialout](https://wiki.debian.org/SystemGroups) on Debian based machine and RedHat/Fedora.
 
-## Where to find the firmware
-[MicroPython documention for esp32](https://docs.micropython.org/en/latest/esp32/quickref.html)
-
-Download the firmware and use `esptool` to erase and flash the firmware.
-```bash
-$ sudo uv run -m esptool -p /dev/ttyUSB0 erase-flash
-$ sudo uv run -m esptool -p /dev/ttyUSB0 --baud 460800 write-flash 0x1000 firmware.bin
+Then type the command:
+```
+ $ sudo usermod -a -G uucp $USER
 ```
 
 ## Turn on and off a led
 
-You can open a repl using an app like `picocom` or `minicom`.
+WHen you only flash the ESP32, the board will follow its boot sequence and Micropython will run a REPL. You can connect to the repl using an app like `picocom` or `minicom`.
 
 ```bash
 $ picocom -b 115200 /dev/ttyUSB0
 ```
 
 `-b 115200` defines the Baud Per Second at which the computer must send data. It also tells us at which pace to read the incoming data. This is part of the serial data communication system. We need to know the rate at which to decode signals; otherwise, we might read the same symbol several times or miss others.
-I did not find where to know that number. I guess this is the default configuration for the usb port on the devkit.
+I did not find where to know that number. 
 
 ```python
 >> from machine import Pin
@@ -77,6 +76,14 @@ I did not find where to know that number. I guess this is the default configurat
 
 To exit picocom, type `C-aC-x`
 
+### Circuit description
+
+We use two cables, a 220Ω resistance and one led.
+1. connect GPIO 33 to the resistance
+2. Connect the resistance to one side of the led
+2. Connect the other side of the resistance to GND
+
+![Picture of the led breadboard circuit](./pictures/led.jpg)
 
 ## Copying files
 
@@ -84,7 +91,7 @@ After we flashed the hardware, there is a filesystem that we can use to store fi
 * boot.py
 * main.py
 
-The file `boot.py` will be the first to ran by the runtime. Then, it is some kind of initializer scrip that we can change to run things. Then, the run time will be `main.py`.
+The file `boot.py` will be the first to ran by the runtime. Then, it is some kind of initializer script that we can change to run things. Then, the run time will be `main.py`.
 
 ### Copy a file
 
@@ -105,17 +112,14 @@ There is a very simple program in `simple_led.py`, let's use as a practice examp
 ```bash
 $ sudo uv run pyboard.py -d /dev/ttyUSB0 -f cp ./simple_led.py :main.py
 ```
-Then reboot the esp32 using the reboot button (the button on the red led side). Here is a picture of how I plugged things on the breadboard:
-
-![Picture of the led breadboard circuit](./pictures/led.jpg)
-
-We put a 220 Ω resistance between the led and the esp32 to diminish the current. The led does not offer enough resistance to be used by itself.
-We plug the resistance with the GPIO 33 and the led with the GND. If it does not work, try to swap the led.
+Then reboot the esp32 using the reboot button (the button on the red led side).
 
 ## Debugging
 
-In our code, we print debug information. The way to see then is to run `picocom -b 115200 /dev/ttyUSB0`. 
-Beware that we cannot have two program using `/dev/ttyUSB0`. So if you're listening to this tty, you won't be able to use `pyboard.py` to copy files on the esp32.
+In our code, we print debug information. The way to see it is the same as when we connected to the rpl. We run `picocom -b 115200 /dev/ttyUSB0`. 
+
+Beware that we cannot have two programs using `/dev/ttyUSB0`. So if you're listening to this tty, you won't be able to use `pyboard.py` to copy files on the esp32.
+
 Try to run the previous program and you will see the debug information.
 
 The most important command to know while running picocom is `C-aC-x`. It will exit the program. The `C-a` switches mode to Raw console and `C-x` is the command to exit raw terminal.
@@ -123,6 +127,8 @@ The most important command to know while running picocom is `C-aC-x`. It will ex
 ## Activate the led remotely
 
 In this example, we will setup a webserver on our esp32 and allow a remote user to turn on and off the led.
+
+TODO: Check basic Wifi for ESP32
 
 ### Files
 * [secret.py](./secret.py): contains the WiFi-credentials. This files is not commit in Git, you need to create it.
@@ -153,6 +159,15 @@ The second file is a very simple webserver that listen to a socket and handle ne
 There is also an async version of the webserver in [async_webserver.py](./async_webserver.py).
 
 ## Button: check button
+
+TODO: Check what is important to know with Interrupt
+
+This wiring is a pull-down type of wiring. This is because we connect one side of the button to the GND and the GPIO we will monitor. The other side of the button is connected to the 3.3V pin.
+
+1. Connect the 3.3V pin to the button.
+2. Connect the other side of the button to GPIO 32.
+3. Connect the same side of the button to a resistance.
+4. Connect the resistance to the GND.
 
 ![Picture of the button breadboard circuit](./pictures/button.jpg)
 
@@ -225,5 +240,5 @@ sudo ufw allow 8080/tcp
 [esptool documentation](https://docs.espressif.com/projects/esptool/en/latest/esp32/esptool/basic-commands.html)
 [micropython firmware for esp32](https://micropython.org/download/ESP32_GENERIC/)
 [Esp32 boot process specificaiton](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/startup.html)
-
+[MicroPython documention for esp32](https://docs.micropython.org/en/latest/esp32/quickref.html)
 [Interrupt documentation Micropython](https://docs.micropython.org/en/latest/reference/isr_rules.html)
