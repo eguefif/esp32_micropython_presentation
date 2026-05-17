@@ -22,6 +22,7 @@ def handler(path):
         return get_body("off")
 
 
+# Entry Point
 def run(async_webserver=False):
     init_network()
     if not async_webserver:

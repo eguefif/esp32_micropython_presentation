@@ -14,7 +14,7 @@ timer = Timer(0)
 state = 0
 
 
-def interrupt_handler(_p):
+def reed_switch_handler(_p):
     global state
     state = 1
 
@@ -35,7 +35,9 @@ def do_notify():
 def run():
     init_network()
     global state
-    pin.irq(handler=interrupt_handler, trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING)
+
+    pin.irq(handler=reed_switch_handler, trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING)
+
     print("Ready to check your door")
     while True:
         if state == 1:
