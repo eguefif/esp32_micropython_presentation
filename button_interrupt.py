@@ -5,8 +5,8 @@ from machine import Pin, Timer
 
 def interrupt_handler(_p):
     global notify
-    if pin.value() == 1:
-        notify = True
+    # if pin.value() == 1:
+    notify = True
 
 
 def do_notify():
