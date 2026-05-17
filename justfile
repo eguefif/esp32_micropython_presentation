@@ -4,7 +4,7 @@ init:
 
 simple-led:
   uv run pyboard.py -d /dev/ttyUSB0 -f cp ./simple_led.py :
-  uv run pyboard.py -d /dev/ttyUSB0 -f cp ./main.py :
+  uv run pyboard.py -d /dev/ttyUSB0 -f cp ./main.py :main.py
 
 server-led:
   just web

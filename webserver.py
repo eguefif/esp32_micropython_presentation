@@ -91,7 +91,7 @@ def start_server(handler):
     print("listening on 0.0.0.0:80")
     while True:
         sock, addr = s.accept()
-        print("client connected from", addr)
+        print("Client connected from", addr)
         try:
             handle_client(sock, handler)
         except Exception as e:
